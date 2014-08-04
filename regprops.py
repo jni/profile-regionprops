@@ -1,6 +1,7 @@
 import numpy as np
 from scipy import ndimage as nd
-from skimage import filter as imfilter, measure
+from skimage import filter as imfilter, measure, io
+from line_profiler import LineProfiler
 
 
 # threshold and labeling number of objects, statistics about object size and
@@ -96,3 +97,13 @@ def object_features(bin_im, im, erode=2, sample_size=None):
         properties[i].append(objects[j].weighted_moments_normalized)
     return properties, prop_names
 
+
+if __name__ == '__main__':
+    image = io.imread('test-image.png')
+    green = image[..., 1].copy()
+    lp = LineProfiler()
+    lp.add_function(object_features)
+    lp.run('intensity_object_features(green, 100)')
+    lp.print_stats()
+    lp.dump_stats('profile.lprof')
+    print(__file__)
